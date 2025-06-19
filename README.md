@@ -66,7 +66,7 @@ PlantUML библиотека для визуализации **Карт гип�
 
 ```plantuml
 @startuml
-!include HypothesisMap.puml
+!include https://raw.githubusercontent.com/ChS23/HypothesisMap-PlantUML/main/HypothesisMap.puml
 
 ' Ваша диаграмма здесь
 
@@ -101,6 +101,10 @@ SHOW_LEGEND()
 ```
 
 ![Пример карты гипотез](example.png)
+
+### 3. Редактирование онлайн
+
+Пример выше в онлайн редакторе доступен по [ссылке](https://www.plantuml.com/plantuml/uml/fP7VQjH05CRlvod6N4sWkzbCq8lsfc1ASj6ea8gNagQ3YUPFI2Q8YD3kWWKHYeXUYOA-m2e6GzV6LpZpHivCAB8GhxeRak6S7z_tpJdx3OzgtkOPkfKMSTQUC9nmNZMxbbL7p-TFKfwqnst3whWiE2luF2vpwsuIKiVoNrGbJrYJDa5KpHvaKS4V1eTM7gN5TczUANtabL56F7i76_0LEd4cbZ303rYB2onUGmSRyTOm4GeOhzEO118SuKyINefJwE4IrjWsTh1j8gyksuhejuRUYrEnWZ_ohn0JlqHO_gwrwBGMrLfRf3DDEYFv2g6mFNxAOav2HGNsNa3t0jKruBCqxyKPhE4AUkYmlE4AleitqC6bMEfS2di70soW_r_xevh4g24k9Y4L1BaiJfkqB8WhSuIgyc_an5VPN7iNliau6prb5MWq-A1hlJ7kOT3VBp3eRVmMAopErL7PwCU0g-ir6UQM2PqqeJStGKTHyumSoRflJmqMVidZJmcVGwylHHs9qGMzFLlScT65aWZz-uyU7nvu1_TSOg9zLfoqUVON).
 
 ## Справочник API
 
