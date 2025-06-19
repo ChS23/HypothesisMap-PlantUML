@@ -1,0 +1,267 @@
+' ===== HypothesisMapCore.puml =====
+' Пакет расширения PlantUML для разработки стратегий по технологии Александра Бындю (картагипотез.рф)
+' Версия: 1.0.0
+
+left to right direction
+
+' ======== ОФИЦИАЛЬНЫЕ ЦВЕТА ========
+
+' Цвета карточек (из официального стандарта)
+!$GOAL_COLOR = "#cee265"
+!$SUBJECT_COLOR = "#f5d127" 
+!$HYPOTHESIS_COLOR = "#fcf3af"
+!$TASK_COLOR = "#c6d4f9"
+!$NEGATIVE_SUBJECT_COLOR = "#ffc191"
+
+' Цвета фона приоритетов
+!$HIGH_PRIORITY_BG = "#f24725"
+!$MEDIUM_PRIORITY_BG = "#fef444"
+!$LOW_PRIORITY_BG = "#8fd14f"
+
+' Цвета приоритетов связей
+!$HIGH_PRIORITY_LINE = "#f24726"
+!$MEDIUM_PRIORITY_LINE = "#fbe32d"
+!$LOW_PRIORITY_LINE = "#8fd14f"
+!$DEFAULT_LINE = "#171717"
+
+' ======== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ========
+
+' Функция для разбиения текста по символу ; с нумерацией
+!function $formatList($text)
+  !if ($text == "")
+    !return ""
+  !endif
+  
+  !$result = ""
+  !$remaining = $text
+  !$counter = 1
+  !$pos = %strpos($remaining, ";")
+  
+  !while ($pos >= 0)
+    !$item = %substr($remaining, 0, $pos)
+    !if (%strlen($item) > 0)
+      !$result = $result + $counter + ". " + $item + "\n"
+      !$counter = $counter + 1
+    !endif
+    !$remaining = %substr($remaining, $pos+1)
+    !$pos = %strpos($remaining, ";")
+  !endwhile
+  
+  !if (%strlen($remaining) > 0)
+    !$result = $result + $counter + ". " + $remaining
+  !endif
+  !return $result
+!endfunction
+
+' Функция для создания цветного блока по приоритету
+!function $priorityBlock($value)
+  !if ($value == 3)
+    !return "<back:#f24726><color:black> " + $value + " </color></back>"
+  !elseif ($value == 2)
+    !return "<back:#fbe32d><color:black> " + $value + " </color></back>"
+  !elseif ($value == 1)
+    !return "<back:#8fd14f><color:black> " + $value + " </color></back>"
+  !else
+    !return ""
+  !endif
+!endfunction
+
+' Универсальная функция для создания связей с массивом элементов
+!unquoted procedure $connectToTargets($from, $targets, $influence)
+  !$items = $targets + ";"
+  !$pos = %strpos($items, ";")
+  !while ($pos > 0)
+    !$target = %substr($items, 0, $pos)
+    !if (%strlen($target) > 0)
+      $target -[hidden]-> $from
+      !if ($influence == 3)
+        HighRel($from, $target)
+      !elseif ($influence == 2)
+        MediumRel($from, $target)
+      !elseif ($influence == 1)
+        LowRel($from, $target)
+      !elseif ($influence > 0)
+        $from --> $target
+      !endif
+    !endif
+    !$items = %substr($items, $pos + 1)
+    !$pos = %strpos($items, ";")
+  !endwhile
+!endprocedure
+
+!function $addSection($content, $title, $text)
+  !if ($text != "")
+    !return $content + "\n**" + $title + ":**\n" + $formatList($text)
+  !endif
+  !return $content
+!endfunction
+
+!function $addSimpleSection($content, $title, $text)
+  !if ($text != "")
+    !return $content + "\n**" + $title + ":** " + $text
+  !endif
+  !return $content
+!endfunction
+
+!function $getStatusEmoji($status)
+  !if ($status == "новая")
+    !return "🆕 " + $status
+  !elseif ($status == "сработала")
+    !return "✅ " + $status
+  !elseif ($status == "отклонена")
+    !return "❌ " + $status
+  !endif
+  !return $status
+!endfunction
+
+' ======== СВЯЗИ ========
+
+!unquoted procedure HighRel($from, $to, $label=" ")
+  !if ($label == " ")
+    $from -[#f24726,thickness=6]-> $to : <size:0>.</size>
+  !else
+    $from -[#f24726,thickness=6]-> $to : $label
+  !endif
+!endprocedure
+
+!unquoted procedure MediumRel($from, $to, $label=" ")
+  !if ($label == " ")
+    $from -[#fbe32d,thickness=4]-> $to : <size:0>.</size>
+  !else
+    $from -[#fbe32d,thickness=4]-> $to : $label
+  !endif
+!endprocedure
+
+!unquoted procedure LowRel($from, $to, $label=" ")
+  !if ($label == " ")
+    $from -[#8fd14f,thickness=1]-> $to : <size:0>.</size>
+  !else
+    $from -[#8fd14f,thickness=1]-> $to : $label
+  !endif
+!endprocedure
+
+' ======== ОСНОВНЫЕ ЭЛЕМЕНТЫ ========
+
+!unquoted procedure Goal($alias, $goal, $metrics="", $balancing_metrics="")
+  !$content = $goal
+  !$content = $addSection($content, "Метрики", $metrics)
+  !$content = $addSection($content, "Балансирующие", $balancing_metrics)
+  rectangle "$content" as $alias $GOAL_COLOR
+!endprocedure
+
+!unquoted procedure Subject($alias, $targets, $description, $pains, $desires, $influence = 0)
+  !$content = $description
+  !$content = $addSimpleSection($content, "Боли", $pains)
+  !$content = $addSimpleSection($content, "Желания", $desires)
+  
+  !if ($influence == 3)
+    rectangle "<back:#f24726><color:black> $influence </color></back>\n$content" as $alias $SUBJECT_COLOR
+  !elseif ($influence == 2)
+    rectangle "<back:#fbe32d><color:black> $influence </color></back>\n$content" as $alias $SUBJECT_COLOR
+  !elseif ($influence == 1)
+    rectangle "<back:#8fd14f><color:black> $influence </color></back>\n$content" as $alias $SUBJECT_COLOR
+  !else
+    rectangle "$content" as $alias $SUBJECT_COLOR
+  !endif
+  
+  $connectToTargets($alias, $targets, $influence)
+!endprocedure
+
+!unquoted procedure NegativeSubject($alias, $targets, $description, $pains, $desires, $influence)
+  !$content = $description
+  !$content = $addSimpleSection($content, "Боли", $pains)
+  !$content = $addSimpleSection($content, "Желания", $desires)
+  
+  !if ($influence == 3)
+    rectangle "<back:#f24726><color:black> $influence </color></back>\n$content" as $alias $NEGATIVE_SUBJECT_COLOR
+  !elseif ($influence == 2)
+    rectangle "<back:#fbe32d><color:black> $influence </color></back>\n$content" as $alias $NEGATIVE_SUBJECT_COLOR
+  !elseif ($influence == 1)
+    rectangle "<back:#8fd14f><color:black> $influence </color></back>\n$content" as $alias $NEGATIVE_SUBJECT_COLOR
+  !else
+    rectangle "$content" as $alias $NEGATIVE_SUBJECT_COLOR
+  !endif
+  
+  $connectToTargets($alias, $targets, $influence)
+!endprocedure
+
+!unquoted procedure Hypothesis($alias, $targets, $if_part, $then_part, $because_part, $influence=0, $cost=0, $status=" ", $reason="")
+  !$content = "**Если:** " + $if_part + "\n**То:** " + $then_part + "\n**Потому что:** " + $because_part
+  !$content = $addSimpleSection($content, "Причина", $reason)
+  
+  !if ($status != " ")
+    !$moji = $getStatusEmoji($status)
+  !endif
+  
+  !$finalContent = $priorityBlock($influence)
+  !if ($finalContent != "")
+    !$finalContent = $finalContent + " " + $moji + "\n" + $content
+  !else
+    !$finalContent = $moji + " " + $content
+  !endif
+  
+  !$costBlock = $priorityBlock($cost)
+  !if ($costBlock != "")
+    !$finalContent = $finalContent + "\n" + $costBlock
+  !endif
+  
+  rectangle "$finalContent" as $alias $HYPOTHESIS_COLOR
+  $connectToTargets($alias, $targets, $influence)
+!endprocedure
+
+!unquoted procedure Task($alias, $targets, $task_description, $readiness="", $deadline="")
+  !$content = $task_description
+  !if ($readiness != "")
+    !$content = $addSimpleSection($content, "Готовность", $readiness + "%")
+  !endif
+  !$content = $addSimpleSection($content, "Дедлайн", $deadline)
+  rectangle "$content" as $alias $TASK_COLOR
+  $connectToTargets($alias, $targets, 4)
+!endprocedure
+
+!unquoted procedure Metric($alias, $goal_alias, $metric_text, $influence = 0)
+  !if ($influence == 0)
+    rectangle "$metric_text" as $alias $GOAL_COLOR
+  !elseif ($influence == 3)
+    rectangle "<back:#f24726><color:black> $influence </color></back>\n$metric_text" as $alias $GOAL_COLOR
+    HighRel($alias, $goal_alias) 
+  !elseif ($influence == 2)
+    rectangle "<back:#fbe32d><color:black> $influence </color></back>\n$metric_text" as $alias $GOAL_COLOR
+    MediumRel($alias, $goal_alias)
+  !else
+    rectangle "<back:#8fd14f><color:black> $influence </color></back>\n$metric_text" as $alias $GOAL_COLOR
+    LowRel($alias, $goal_alias)
+  !endif
+  $goal_alias -[hidden]-> $alias
+!endprocedure
+
+!unquoted procedure Group($alias, $label, $color="#f2f2f2")
+  rectangle "$label" as $alias $color
+!endprocedure
+
+' ======== НАСТРОЙКИ МАКЕТА ========
+
+!unquoted procedure LAYOUT_LEFT_TO_RIGHT()
+  left to right direction
+!endprocedure
+
+' ======== ЛЕГЕНДА ========
+
+skinparam legend {
+  backgroundColor transparent
+  borderColor transparent
+}
+
+skinparam legendFontSize 14
+skinparam legendFontName "Segoe UI"
+skinparam legendMargin 4
+
+!unquoted procedure SHOW_LEGEND()
+  legend right
+    |<color:#cee265>  ■  </color>| Цель, метрики |
+    |<color:#f5d127>  ■  </color>| Субъект, мотивация |
+    |<color:#fcf3af>  ■  </color>| Гипотеза |
+    |<color:#c6d4f9>  ■  </color>| Задача |
+    |<color:#ffc191>  ■  </color>| Негативный субъект |
+  endlegend
+!endprocedure
