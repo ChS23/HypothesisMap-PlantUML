@@ -4,6 +4,12 @@
 
 left to right direction
 
+skinparam rectangle {
+  BorderColor transparent
+  roundCorner 0
+  shadowing true
+}
+
 ' ======== ОФИЦИАЛЬНЫЕ ЦВЕТА ========
 
 ' Цвета карточек (из официального стандарта)
